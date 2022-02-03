@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mission4Assignment.Models;
 using System;
@@ -12,12 +13,12 @@ namespace Mission4Assignment.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private MovieContext _blahContext { get; set; }
+        private MovieContext McContext { get; set; }
 
         public HomeController(ILogger<HomeController> logger, MovieContext someName)
         {
             _logger = logger;
-            _blahContext = someName;
+            McContext = someName;
         }
 
         public IActionResult Index()
@@ -28,6 +29,8 @@ namespace Mission4Assignment.Controllers
         [HttpGet]
         public IActionResult MovieApplication()
         {
+            ViewBag.Categories = McContext.Categories.ToList();
+
             return View();
         }
         [HttpPost]
@@ -35,11 +38,62 @@ namespace Mission4Assignment.Controllers
         {
             if (ModelState.IsValid)
             {
-                _blahContext.Add(ar);
-                _blahContext.SaveChanges();
+                McContext.Add(ar);
+                McContext.SaveChanges();
                 return View("Confirmation", ar);
             }
-            return View();
+            else
+            {
+                ViewBag.Categories = McContext.Categories.ToList();
+                return View();
+            }
+            
+        }
+
+        public IActionResult FilmList()
+        {
+            var applications = McContext.responses
+                .Include(x=> x.Category)
+                .OrderBy(x=> x.Title)
+                .ToList();
+
+            return View(applications);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int movieid)
+        {
+            ViewBag.Categories = McContext.Categories.ToList();
+
+            var application = McContext.responses.Single(x=> x.MovieId == movieid);
+
+            return View("MovieApplication", application);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(AppResponse info)
+        {
+            McContext.Update(info);
+            McContext.SaveChanges();
+
+            return RedirectToAction("FilmList");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int movieid)
+        {
+            var application = McContext.responses.Single(x => x.MovieId == movieid);
+
+            return View(application);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(AppResponse ar)
+        {
+            McContext.responses.Remove(ar);
+            McContext.SaveChanges();
+
+            return RedirectToAction("FilmList");
         }
 
         public IActionResult MyPodcasts()

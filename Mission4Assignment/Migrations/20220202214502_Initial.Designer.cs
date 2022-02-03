@@ -8,7 +8,7 @@ using Mission4Assignment.Models;
 namespace Mission4Assignment.Migrations
 {
     [DbContext(typeof(MovieContext))]
-    [Migration("20220126200014_Initial")]
+    [Migration("20220202214502_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,9 +23,8 @@ namespace Mission4Assignment.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Director")
                         .IsRequired()
@@ -54,13 +53,15 @@ namespace Mission4Assignment.Migrations
 
                     b.HasKey("MovieId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("responses");
 
                     b.HasData(
                         new
                         {
                             MovieId = 1,
-                            Category = "Action/Sci-Fi",
+                            CategoryId = 1,
                             Director = "Christopher Nolan",
                             Edited = false,
                             Lent = "",
@@ -72,7 +73,7 @@ namespace Mission4Assignment.Migrations
                         new
                         {
                             MovieId = 2,
-                            Category = "Adventure/Action",
+                            CategoryId = 2,
                             Director = "Gore Verbinski",
                             Edited = false,
                             Lent = "",
@@ -84,7 +85,7 @@ namespace Mission4Assignment.Migrations
                         new
                         {
                             MovieId = 3,
-                            Category = "Romance/War",
+                            CategoryId = 3,
                             Director = "Victor Fleming",
                             Edited = false,
                             Lent = "",
@@ -93,6 +94,76 @@ namespace Mission4Assignment.Migrations
                             Title = "Gone with the Wind",
                             Year = 1939
                         });
+                });
+
+            modelBuilder.Entity("Mission4Assignment.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Action/Sci-fi"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Adventure/Action"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Romance/War"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            CategoryName = "Comedy"
+                        },
+                        new
+                        {
+                            CategoryId = 5,
+                            CategoryName = "Horror"
+                        },
+                        new
+                        {
+                            CategoryId = 6,
+                            CategoryName = "Thriller"
+                        },
+                        new
+                        {
+                            CategoryId = 7,
+                            CategoryName = "Romance/Comedy"
+                        },
+                        new
+                        {
+                            CategoryId = 8,
+                            CategoryName = "Drama"
+                        },
+                        new
+                        {
+                            CategoryId = 9,
+                            CategoryName = "Other"
+                        });
+                });
+
+            modelBuilder.Entity("Mission4Assignment.Models.AppResponse", b =>
+                {
+                    b.HasOne("Mission4Assignment.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
